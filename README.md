@@ -8,7 +8,7 @@
 
 Interface futuriste · Moteurs ADB/Fastboot réels · Sauvegardes chiffrées AES-256-GCM · 100 % hors ligne
 
-[![build](https://github.com/mamadounthiam1998-source/ghost-android/actions/workflows/build.yml/badge.svg)](https://github.com/mamadounthiam1998-source/ghost-android/actions/workflows/build.yml)
+[![build](https://github.com/mamadounthiam1998-source/android/actions/workflows/build.yml/badge.svg)](https://github.com/mamadounthiam1998-source/android/actions/workflows/build.yml)
 
 </div>
 
