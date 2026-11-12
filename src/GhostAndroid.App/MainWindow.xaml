@@ -1,0 +1,119 @@
+<Window
+    x:Class="GhostAndroid.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:vm="clr-namespace:GhostAndroid.App.ViewModels"
+    xmlns:views="clr-namespace:GhostAndroid.App.Views"
+    Title="GHOST ANDROID" Height="760" Width="1200" MinHeight="600" MinWidth="980"
+    WindowStartupLocation="CenterScreen" WindowStyle="None" Background="{StaticResource AppBackground}"
+    AllowsTransparency="False">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="52" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <!-- Icônes vectorielles (géométries remplies) -->
+        <StreamGeometry x:Key="IconDashboard">M3,3H10V10H3Z M14,3H21V8H14Z M14,11H21V21H14Z M3,13H10V21H3Z</StreamGeometry>
+        <StreamGeometry x:Key="IconConsole">M4,5 L4,19 L9,12 Z M11,16 H19 V18 H11 Z</StreamGeometry>
+        <StreamGeometry x:Key="IconRepair">M4,13H7V20H4Z M10,8H13V20H10Z M16,4H19V20H16Z</StreamGeometry>
+        <StreamGeometry x:Key="IconSystem">M6,6H18V18H6Z M9,2H10V5H9Z M14,2H15V5H14Z M9,19H10V22H9Z M14,19H15V22H14Z M2,9H5V10H2Z M2,14H5V15H2Z M19,9H22V10H19Z M19,14H22V15H19Z</StreamGeometry>
+        <StreamGeometry x:Key="IconBackup">M12,2 L20,5 V11 C20,16 16,20 12,22 C8,20 4,16 4,11 V5 Z</StreamGeometry>
+        <StreamGeometry x:Key="IconFirmware">M11,3H13V12H17L12,17L7,12H11Z M5,19H19V21H5Z</StreamGeometry>
+        <StreamGeometry x:Key="IconLock">M8,10V7a4,4 0 0 1 8,0h-2a2,2 0 0 0 -4,0v3h9v11H7V10Z</StreamGeometry>
+        <StreamGeometry x:Key="IconGhost">M12,2 C7.6,2 4,5.6 4,10 V21 L7,19 L9.5,21 L12,19 L14.5,21 L17,19 L20,21 V10 C20,5.6 16.4,2 12,2 Z M9,11 a1.3,1.3 0 1 1 0,-0.01 Z M15,11 a1.3,1.3 0 1 1 0,-0.01 Z</StreamGeometry>
+
+        <!-- Association ViewModel -> Vue -->
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ConsoleViewModel}"><views:ConsoleView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DiagnosticsViewModel}"><views:DiagnosticsView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SystemViewModel}"><views:SystemView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:BackupViewModel}"><views:BackupView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FirmwareViewModel}"><views:FirmwareView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:UnlockViewModel}"><views:UnlockView /></DataTemplate>
+    </Window.Resources>
+
+    <Border BorderBrush="{StaticResource Border}" BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="248" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- ============ BARRE DE NAVIGATION ============ -->
+            <Border Grid.Column="0" Background="{StaticResource Bg1}" BorderBrush="{StaticResource Border}" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <!-- Logo -->
+                    <Border DockPanel.Dock="Top" Height="78" Padding="20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Width="30" Height="30" Stretch="Uniform" Data="{StaticResource IconGhost}"
+                                  Fill="{StaticResource AccentGradient}" Effect="{StaticResource CyanGlow}" />
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="GHOST" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                                <TextBlock Text="ANDROID" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource AccentCyan}" Margin="0,-2,0,0" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Statut outils -->
+                    <Border DockPanel.Dock="Bottom" Padding="20,14" BorderBrush="{StaticResource Border}" BorderThickness="0,1,0,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding ToolStatus}" Style="{StaticResource Caption}" TextWrapping="Wrap" />
+                            <TextBlock Text="v0.1.0 · 100% hors ligne" Style="{StaticResource Caption}" Margin="0,4,0,0" Opacity="0.7" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Menu -->
+                    <StackPanel Margin="0,8">
+                        <RadioButton Style="{StaticResource NavButton}" GroupName="nav" IsChecked="True" Content="Tableau de bord"
+                                     Tag="{StaticResource IconDashboard}"
+                                     Command="{Binding NavigateCommand}" CommandParameter="Dashboard" />
+                        <RadioButton Style="{StaticResource NavButton}" GroupName="nav" Content="Console ADB / Fastboot"
+                                     Tag="{StaticResource IconConsole}"
+                                     Command="{Binding NavigateCommand}" CommandParameter="Console" />
+                        <RadioButton Style="{StaticResource NavButton}" GroupName="nav" Content="Réparation &amp; diagnostic"
+                                     Tag="{StaticResource IconRepair}"
+                                     Command="{Binding NavigateCommand}" CommandParameter="Diagnostics" />
+                        <RadioButton Style="{StaticResource NavButton}" GroupName="nav" Content="Système &amp; applications"
+                                     Tag="{StaticResource IconSystem}"
+                                     Command="{Binding NavigateCommand}" CommandParameter="System" />
+                        <RadioButton Style="{StaticResource NavButton}" GroupName="nav" Content="Sauvegarde &amp; restauration"
+                                     Tag="{StaticResource IconBackup}"
+                                     Command="{Binding NavigateCommand}" CommandParameter="Backup" />
+                        <RadioButton Style="{StaticResource NavButton}" GroupName="nav" Content="Firmware &amp; mise à jour"
+                                     Tag="{StaticResource IconFirmware}"
+                                     Command="{Binding NavigateCommand}" CommandParameter="Firmware" />
+                        <RadioButton Style="{StaticResource NavButton}" GroupName="nav" Content="Verrous &amp; accès"
+                                     Tag="{StaticResource IconLock}"
+                                     Command="{Binding NavigateCommand}" CommandParameter="Unlock" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- ============ ZONE PRINCIPALE ============ -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="52" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Barre de titre / chrome -->
+                <Grid Grid.Row="0" Background="{StaticResource Bg1}">
+                    <TextBlock Text="GHOST ANDROID" VerticalAlignment="Center" Margin="20,0"
+                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Button Content="—" Click="OnMinimize" Width="46" Height="52" Style="{StaticResource CaptionButton}" />
+                        <Button Content="▢" Click="OnMaxRestore" Width="46" Height="52" Style="{StaticResource CaptionButton}" />
+                        <Button Content="✕" Click="OnClose" Width="46" Height="52" Style="{StaticResource CaptionCloseButton}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Contenu de la section active -->
+                <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}" Margin="0" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

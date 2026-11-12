@@ -1,0 +1,107 @@
+<UserControl
+    x:Class="GhostAndroid.App.Views.DashboardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="28,22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- En-tête -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="Tableau de bord" Style="{StaticResource H1}" />
+                <TextBlock Text="Appareils Android connectés et leur état" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <!-- Indicateur de détection animé -->
+                <Border Background="{StaticResource SurfaceAlt}" CornerRadius="20" Padding="12,7" Margin="0,0,12,0"
+                        Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="9" Height="9" Fill="{StaticResource AccentCyan}" VerticalAlignment="Center">
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.3" To="1" Duration="0:0:0.7" AutoReverse="True" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                        <TextBlock Text="Détection…" Margin="8,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource AccentCyan}" />
+                    </StackPanel>
+                </Border>
+                <Button Content="⟳  Détecter les appareils" Style="{StaticResource PrimaryButton}"
+                        Command="{Binding DetectCommand}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- État vide -->
+        <Border Grid.Row="1" Style="{StaticResource Card}"
+                Visibility="{Binding NoDevices, Converter={StaticResource BoolToVis}}">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Path Width="90" Height="90" Stretch="Uniform" Opacity="0.5"
+                      Fill="{StaticResource TextSecondary}"
+                      Data="M12,2 C7.6,2 4,5.6 4,10 V21 L7,19 L9.5,21 L12,19 L14.5,21 L17,19 L20,21 V10 C20,5.6 16.4,2 12,2 Z" />
+                <TextBlock Text="Aucun appareil détecté" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,18,0,6" />
+                <TextBlock HorizontalAlignment="Center" Style="{StaticResource Caption}" TextAlignment="Center" MaxWidth="420"
+                           Text="Connectez un appareil Android en USB, activez le débogage USB, puis lancez la détection. Marques prises en charge : Samsung, Xiaomi/Redmi/POCO, Google Pixel, OnePlus, OPPO, Vivo, Motorola, Sony, Nokia et autres compatibles ADB." />
+            </StackPanel>
+        </Border>
+
+        <!-- Grille des appareils -->
+        <ListBox Grid.Row="1" ItemsSource="{Binding Cards}" SelectedItem="{Binding SelectedCard}"
+                 Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 Visibility="{Binding HasDevices, Converter={StaticResource BoolToVis}}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Margin" Value="0,0,16,16" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border x:Name="card" Width="330" Background="{StaticResource Surface}"
+                                        BorderBrush="{StaticResource Border}" BorderThickness="1" CornerRadius="14"
+                                        Padding="18" Cursor="Hand" Effect="{StaticResource SoftShadow}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Width="10" Height="10" VerticalAlignment="Center"
+                                                         Fill="{Binding Mode, Converter={StaticResource ModeToBrush}}" />
+                                                <TextBlock Text="{Binding ModeText}" Margin="8,0,0,0" VerticalAlignment="Center"
+                                                           Foreground="{Binding Mode, Converter={StaticResource ModeToBrush}}" FontSize="12" FontWeight="SemiBold" />
+                                            </StackPanel>
+                                            <Border HorizontalAlignment="Right" Background="{StaticResource SurfaceAlt}" CornerRadius="10" Padding="8,3"
+                                                    Visibility="{Binding HasBattery, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{Binding BatteryText}" FontSize="12" Foreground="{StaticResource TextSecondary}" />
+                                            </Border>
+                                        </Grid>
+                                        <TextBlock Text="{Binding Title}" FontSize="19" FontWeight="SemiBold" Margin="0,14,0,2" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis" />
+                                        <Border Height="1" Background="{StaticResource Border}" Margin="0,14" />
+                                        <TextBlock Text="{Binding AndroidLine}" Foreground="{StaticResource TextSecondary}" FontSize="13" Margin="0,0,0,4" />
+                                        <TextBlock Text="{Binding BuildLine}" Foreground="{StaticResource TextSecondary}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentCyan}" />
+                                        <Setter TargetName="card" Property="Effect" Value="{StaticResource CyanGlow}" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource AccentBlue}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+    </Grid>
+</UserControl>

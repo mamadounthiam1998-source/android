@@ -1,0 +1,116 @@
+<UserControl
+    x:Class="GhostAndroid.App.Views.SystemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="28,22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Système &amp; applications" Style="{StaticResource H1}" />
+            <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,0"
+                       Text="Informations système, gestion des applications (APK), stockage et redémarrages — via ADB." />
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Colonne gauche : infos + stockage + reboot -->
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0" Content="Charger les informations" Style="{StaticResource GhostButton}"
+                        HorizontalAlignment="Left" Command="{Binding LoadInfoCommand}" Margin="0,0,0,12" />
+
+                <Border Grid.Row="1" Style="{StaticResource Card}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Info}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="150" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Key}" Foreground="{StaticResource TextSecondary}" FontSize="13" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" FontSize="13"
+                                                       Foreground="{StaticResource TextPrimary}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Border Height="1" Background="{StaticResource Border}" Margin="0,8"
+                                    Visibility="{Binding StorageInfo, Converter={StaticResource NullToVis}}" />
+                            <TextBlock Text="Stockage" Style="{StaticResource H2}" FontSize="14" Margin="0,0,0,6" />
+                            <TextBlock Text="{Binding StorageInfo}" FontFamily="{StaticResource MonoFont}" FontSize="12"
+                                       Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource GhostButton}">
+                            <Setter Property="Height" Value="36" /><Setter Property="Margin" Value="0,0,8,0" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Content="Redémarrer" Command="{Binding RebootCommand}" CommandParameter="normal" />
+                    <Button Content="Recovery" Command="{Binding RebootCommand}" CommandParameter="recovery" />
+                    <Button Content="Bootloader" Command="{Binding RebootCommand}" CommandParameter="bootloader" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Colonne droite : applications -->
+            <Grid Grid.Column="1" Margin="8,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding PackageFilter, UpdateSourceTrigger=PropertyChanged}"
+                             Height="36" VerticalContentAlignment="Center" />
+                    <Button Grid.Column="1" Content="Lister" Style="{StaticResource GhostButton}" Height="36" Margin="8,0,0,0"
+                            Command="{Binding LoadPackagesCommand}" />
+                </Grid>
+
+                <Border Grid.Row="1" Style="{StaticResource Card}" Padding="6">
+                    <ListBox ItemsSource="{Binding Packages}" SelectedItem="{Binding SelectedPackage}"
+                             Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextPrimary}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="8,6" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                                <Setter Property="FontFamily" Value="{StaticResource MonoFont}" />
+                                <Setter Property="FontSize" Value="12.5" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </Border>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Content="Installer un APK…" Style="{StaticResource GhostButton}" Height="36" Margin="0,0,8,0"
+                            Command="{Binding InstallApkCommand}" />
+                    <Button Content="Désinstaller la sélection" Style="{StaticResource DangerButton}" Height="36"
+                            Command="{Binding UninstallCommand}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

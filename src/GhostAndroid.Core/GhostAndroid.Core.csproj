@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Cœur multiplateforme de GHOST ANDROID.
+    Volontairement ciblé net8.0 (et non net8.0-windows) : aucune dépendance Windows,
+    donc il compile et se teste sur Linux/macOS/Windows en intégration continue.
+    Toute la logique "métier" réelle (ADB, Fastboot, détection, chiffrement, SQLite)
+    vit ici. L'UI WPF (Windows) consomme ce cœur.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>GhostAndroid.Core</RootNamespace>
+    <AssemblyName>GhostAndroid.Core</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+
+</Project>

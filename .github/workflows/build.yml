@@ -1,0 +1,76 @@
+name: build
+
+# Compile réellement l'application WPF et exécute les tests sur un runner Windows.
+# C'est la "preuve de build" du projet : si ce workflow est vert, la solution compile
+# sur Windows et la suite de tests passe pour de bon.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  core-tests:
+    name: Cœur + tests (multiplateforme)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore (Core + Tests)
+        run: |
+          dotnet restore src/GhostAndroid.Core/GhostAndroid.Core.csproj
+          dotnet restore tests/GhostAndroid.Core.Tests/GhostAndroid.Core.Tests.csproj
+      - name: Build Core
+        run: dotnet build src/GhostAndroid.Core/GhostAndroid.Core.csproj -c Release --no-restore
+      - name: Run tests
+        run: dotnet test tests/GhostAndroid.Core.Tests/GhostAndroid.Core.Tests.csproj -c Release --no-restore --logger "trx;LogFileName=tests.trx"
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/*.trx'
+
+  windows-app:
+    name: Application WPF (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore solution
+        run: dotnet restore GhostAndroid.sln
+      - name: Build solution (Release)
+        run: dotnet build GhostAndroid.sln -c Release --no-restore
+      - name: Test solution
+        run: dotnet test GhostAndroid.sln -c Release --no-restore --logger "trx;LogFileName=tests.trx"
+      - name: Publish WPF app (win-x64, framework-dependent)
+        run: >
+          dotnet publish src/GhostAndroid.App/GhostAndroid.App.csproj
+          -c Release -r win-x64 --self-contained false
+          -p:PublishSingleFile=false
+          -o artifacts/app
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Build installer
+        run: >
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          /DAppVersion=0.1.0
+          /DSourceDir=..\artifacts\app
+          installer\GhostAndroid.iss
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghost-android-app
+          path: artifacts/app
+      - name: Upload installer artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghost-android-installer
+          path: installer/Output/*.exe
