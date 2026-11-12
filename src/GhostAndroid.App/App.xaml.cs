@@ -39,6 +39,7 @@ public partial class App : Application
                 // --- Cœur ---
                 s.AddSingleton<IProcessRunner, ProcessRunner>();
                 s.AddSingleton(_ => new PlatformToolsLocator());
+                s.AddSingleton<PlatformToolsInstaller>();
                 s.AddSingleton<IAdbEngine, AdbEngine>();
                 s.AddSingleton<IFastbootEngine, FastbootEngine>();
                 s.AddSingleton<IDeviceDetectionService, DeviceDetectionService>();

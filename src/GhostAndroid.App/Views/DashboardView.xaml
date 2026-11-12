@@ -6,6 +6,7 @@
     <Grid Margin="28,22">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -39,21 +40,45 @@
             </StackPanel>
         </Grid>
 
+        <!-- Bannière : outils ADB manquants (cause n°1 de non-détection) -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" BorderBrush="{StaticResource Warning}" Margin="0,0,0,14"
+                Visibility="{Binding ToolsMissing, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="⚠ Outils ADB non installés" Foreground="{StaticResource Warning}" FontWeight="SemiBold" />
+                    <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,0" TextWrapping="Wrap"
+                               Text="Sans adb/fastboot, aucun appareil ne peut être détecté. Cliquez pour les télécharger automatiquement depuis Google (sources officielles)." />
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0"
+                                Visibility="{Binding IsInstallingTools, Converter={StaticResource BoolToVis}}">
+                        <ProgressBar Style="{StaticResource ModernProgress}" Width="220" Value="{Binding InstallProgress}" Maximum="100" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding InstallStage}" Foreground="{StaticResource AccentCyan}" FontSize="12" Margin="12,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+                <Button Grid.Column="1" Content="⬇  Installer ADB" Style="{StaticResource PrimaryButton}" VerticalAlignment="Center"
+                        Command="{Binding InstallToolsCommand}"
+                        IsEnabled="{Binding IsInstallingTools, Converter={StaticResource InverseBool}}" />
+            </Grid>
+        </Border>
+
         <!-- État vide -->
-        <Border Grid.Row="1" Style="{StaticResource Card}"
+        <Border Grid.Row="2" Style="{StaticResource Card}"
                 Visibility="{Binding NoDevices, Converter={StaticResource BoolToVis}}">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <Path Width="90" Height="90" Stretch="Uniform" Opacity="0.5"
                       Fill="{StaticResource TextSecondary}"
                       Data="M12,2 C7.6,2 4,5.6 4,10 V21 L7,19 L9.5,21 L12,19 L14.5,21 L17,19 L20,21 V10 C20,5.6 16.4,2 12,2 Z" />
                 <TextBlock Text="Aucun appareil détecté" Style="{StaticResource H2}" HorizontalAlignment="Center" Margin="0,18,0,6" />
-                <TextBlock HorizontalAlignment="Center" Style="{StaticResource Caption}" TextAlignment="Center" MaxWidth="420"
-                           Text="Connectez un appareil Android en USB, activez le débogage USB, puis lancez la détection. Marques prises en charge : Samsung, Xiaomi/Redmi/POCO, Google Pixel, OnePlus, OPPO, Vivo, Motorola, Sony, Nokia et autres compatibles ADB." />
+                <TextBlock HorizontalAlignment="Center" Style="{StaticResource Caption}" TextAlignment="Center" MaxWidth="460" LineHeight="20"
+                           Text="Pour qu'un appareil apparaisse : 1) installez les outils ADB (bouton ci-dessus si manquants) ; 2) branchez le téléphone en USB ; 3) activez le &quot;Débogage USB&quot; (Options développeur) ; 4) sur le téléphone, acceptez l'invite &quot;Autoriser le débogage USB&quot; ; 5) si rien n'apparaît, installez le pilote USB du fabricant. Marques compatibles : Samsung, Xiaomi/Redmi/POCO, Pixel, OnePlus, OPPO, Vivo, Motorola, Sony, Nokia, etc." />
             </StackPanel>
         </Border>
 
         <!-- Grille des appareils -->
-        <ListBox Grid.Row="1" ItemsSource="{Binding Cards}" SelectedItem="{Binding SelectedCard}"
+        <ListBox Grid.Row="2" ItemsSource="{Binding Cards}" SelectedItem="{Binding SelectedCard}"
                  Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  Visibility="{Binding HasDevices, Converter={StaticResource BoolToVis}}">
             <ListBox.ItemsPanel>

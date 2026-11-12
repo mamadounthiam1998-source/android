@@ -20,6 +20,14 @@ public sealed class PlatformToolsLocator
     public static string AdbFileName => IsWindows ? "adb.exe" : "adb";
     public static string FastbootFileName => IsWindows ? "fastboot.exe" : "fastboot";
 
+    /// <summary>
+    /// Dossier géré par GHOST ANDROID où l'installateur automatique dépose les
+    /// Platform Tools officiels : %AppData%/GhostAndroid/platform-tools.
+    /// </summary>
+    public static string ManagedToolsDirectory => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "GhostAndroid", "platform-tools");
+
     /// <summary>Chemin complet vers adb, ou null si introuvable.</summary>
     public string? FindAdb() => Find(AdbFileName);
 
@@ -52,6 +60,9 @@ public sealed class PlatformToolsLocator
         yield return Path.Combine(baseDir, "tools", "platform-tools");
         yield return Path.Combine(baseDir, "platform-tools");
         yield return baseDir;
+
+        // Dossier de données de l'application (où l'installateur ADB automatique place les outils).
+        yield return ManagedToolsDirectory;
 
         // PATH
         var path = Environment.GetEnvironmentVariable("PATH");
